@@ -18,7 +18,7 @@ import {
         throw new UnauthorizedException('Authorization header is missing');
       }
   
-      const token = authHeader.split(' ')[1]; // Extract token from Bearer <token>
+      const token = authHeader.split(' ')[1];
       if (!token) {
         throw new UnauthorizedException('Token not provided');
       }
@@ -28,7 +28,7 @@ import {
         throw new UnauthorizedException('Invalid or expired token');
       }
   
-      request.user = user; // Attach user to the request
+      request.currentUser = user;
       return true;
     }
   }

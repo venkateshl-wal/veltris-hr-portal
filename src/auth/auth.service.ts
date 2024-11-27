@@ -8,7 +8,7 @@ export class AuthService {
   async validateToken(token: string): Promise<any> {
     try {
       const decoded = await this.jwtService.verifyAsync(token);
-      return decoded; // Return decoded payload
+      return decoded;
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
     }

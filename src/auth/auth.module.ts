@@ -11,11 +11,11 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET, // Use a strong secret
-      signOptions: { expiresIn: process.env.JWT_EXPIRATION_TIME }, // Token expiration time
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.JWT_EXPIRATION_TIME },
     }),
   ],
-  providers: [AuthService, AuthGuard], // Include AuthService and Guard
-  exports: [AuthService, JwtModule],   // Export AuthService and JwtModule for use in other modules
+  providers: [AuthService, AuthGuard],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
