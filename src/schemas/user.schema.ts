@@ -18,8 +18,8 @@ export class User extends Document {
   @Prop({ required: true })
   gender: string;
 
-  @Prop({ required: true })
-  photo: string;
+  @Prop()
+  photo?: string;
 
   @Prop({ required: true })
   password: string;

@@ -1,13 +1,19 @@
-import { IsEmail, IsString, IsUrl, Matches, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  Matches,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
   readonly firstName: string;
-  
+
   @IsString()
   readonly lastName: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'Invalid email address' })
   readonly email: string;
 
   @IsString()
@@ -33,8 +39,7 @@ export class CreateUserDto {
   })
   readonly password: string;
 
+  @IsOptional()
   @IsString()
-  @IsUrl()
-  readonly photo: string;
-
+  readonly photo?: string;
 }
