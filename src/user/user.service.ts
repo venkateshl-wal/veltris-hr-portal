@@ -3,6 +3,7 @@ import {
   BadRequestException,
   ConflictException,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/schemas/user.schema';
@@ -10,6 +11,7 @@ import mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { TemplateService } from 'src/template/template.service';
+import { ChangePasswordDto } from './dtos/changePassword.dto';
 
 @Injectable()
 export class UserService {
@@ -88,6 +90,26 @@ export class UserService {
       throw new InternalServerErrorException(
         `Failed to create user: ${error.message}`,
       );
+    }
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto): Promise<Object> {
+    try {
+      const { userId, oldPassword, newPassword } = changePasswordDto;
+      const user = await this.userModel.findById(userId);
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        throw new UnauthorizedException('Old password is incorrect');
+      }
+      const hasedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hasedPassword;
+      await user.save();
+      return { message: 'Password changed successfully' };
+    } catch (error) {
+      throw error;
     }
   }
 }

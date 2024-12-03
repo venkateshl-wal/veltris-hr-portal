@@ -9,12 +9,14 @@ import {
   UseGuards,
   UploadedFile,
   UseInterceptors,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { Response } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ChangePasswordDto } from './dtos/changePassword.dto';
 
 @Controller('user')
 export class UserController {
@@ -67,6 +69,16 @@ export class UserController {
         photo,
       );
       return { message: 'User created successfully', userDetails };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('change-password')
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    try {
+      return await this.userService.changePassword(changePasswordDto);
     } catch (error) {
       throw error;
     }
