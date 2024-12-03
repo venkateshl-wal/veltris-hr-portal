@@ -1,8 +1,22 @@
-import { Body, Controller, Get, Post, Query, Res, BadRequestException, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Res,
+  BadRequestException,
+  UseGuards,
+  UploadedFile,
+  UseInterceptors,
+  Patch,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/createUser.dto';
 import { Response } from 'express';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ChangePasswordDto } from './dtos/changePassword.dto';
 
 @Controller('user')
 export class UserController {
@@ -22,10 +36,13 @@ export class UserController {
   async login(
     @Query('email') email: string,
     @Query('password') password: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     try {
-      const { token, user } = await this.userService.createToken(email, password);
+      const { token, user } = await this.userService.createToken(
+        email,
+        password,
+      );
 
       // Set token in response headers
       res.setHeader('Authorization', `Bearer ${token}`);
@@ -41,11 +58,29 @@ export class UserController {
   }
 
   @Post()
-  async register(@Body() createUserDto: CreateUserDto) {
+  @UseInterceptors(FileInterceptor('photo'))
+  async register(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile() photo: Express.Multer.File,
+  ) {
     try {
-      return await this.userService.createUser(createUserDto);
+      const userDetails = await this.userService.createUser(
+        createUserDto,
+        photo,
+      );
+      return { message: 'User created successfully', userDetails };
     } catch (error) {
-      throw error
+      throw error;
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch('change-password')
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    try {
+      return await this.userService.changePassword(changePasswordDto);
+    } catch (error) {
+      throw error;
     }
   }
 }
