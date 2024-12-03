@@ -12,6 +12,7 @@ import {
 import { TemplateService } from './template.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { UploadTemplateDto } from './dtos/upload-template.dto';
 
 @Controller('templates')
 export class TemplateController {
@@ -22,13 +23,15 @@ export class TemplateController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadTemplate(
     @UploadedFile() file: Express.Multer.File,
-    @Body('version') version: string,
+    @Body() uploadTemplateDto: UploadTemplateDto,
   ) {
+    const { name, version } = uploadTemplateDto;
     if (!file) {
       throw new HttpException('File is required', HttpStatus.BAD_REQUEST);
     }
     try {
       const templateDetails = await this.templateService.insertTemplate(
+        name,
         version,
         file,
       );

@@ -37,24 +37,20 @@ export class TemplateService {
     }
   }
 
-  async insertTemplate(version, file: Express.Multer.File): Promise<Template> {
-    if (!file) {
-      throw new InternalServerErrorException(
-        'File is required to insert a template.',
-      );
-    }
+  async insertTemplate(name, version, file: Express.Multer.File): Promise<Template> {
     try {
       const templateURL = await this.uploadFile(file);
 
       const templateParam = {
-        name: file.originalname,
+        name,
+        fileName: file.originalname,
         version: version,
         templateurl: templateURL,
       };
       return await this.templateModel.create(templateParam);
     } catch (error) {
       throw new InternalServerErrorException(
-        `Failed to insert template: ${error.message}`,
+        `Failed to upload template: ${error.message}`,
       );
     }
   }
